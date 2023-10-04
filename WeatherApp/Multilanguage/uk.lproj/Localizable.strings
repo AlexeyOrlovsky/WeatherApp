@@ -1,0 +1,16 @@
+/* 
+  Localizable.strings
+  WeatherApp
+
+  Created by Алексей Орловский on 04.10.2023.
+  
+*/
+
+"Location permission required" = "Потрібний дозвіл на місцезнаходження";
+
+"Max" = "Максимум";
+
+"H" = "Макс";
+"L" = "Мін";
+"Tomorrow" = "Завтра";
+"DayAfterTomorrow" = "Післязавтра";
