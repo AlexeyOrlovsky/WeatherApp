@@ -6,11 +6,32 @@
   
 */
 
+// text in case temperature data is not received
 "Location permission required" = "Location permission required";
 
+// Maximum temperature value
 "Max" = "Max";
 
+// Height temperature value
 "H" = "H";
+
+// Low temperature value
 "L" = "L";
+
+// Tomorrow text
 "Tomorrow" = "Tomorrow";
+
+// Day After Tomorrow text
 "DayAfterTomorrow" = "Day after tomorrow";
+
+// Access
+"Access disabled" = "Access to location data is disabled";
+
+// Provide
+"provide access to geodata" = "You need to give access to geodata so we can show you the weather in your city.";
+
+// Allow
+"Allow" = "Allow";
+
+// Cancel
+"Cancel" = "Cancel";

@@ -16,14 +16,14 @@ class WeatherDataManager {
     private let forecastEndpoint = "/forecast.json"
     private let apiKey = "446e407a04b9438eaa6122505230210"
 
-    // Метод для сохранения данных в Realm
+    /// Save data in Realm base
     func saveWeatherData(weatherData: WeatherDataRealm) {
         do {
             let realm = try Realm()
             
             if let existingWeatherData = realm.objects(WeatherDataRealm.self).filter("cityName == %@", weatherData.cityName).first {
                 try realm.write {
-                    // Если запись существует, обновить данными из сети
+                    // If record exist, update data from network
                     existingWeatherData.currentTemperature = weatherData.currentTemperature
                     existingWeatherData.maxTemperatureToday = weatherData.maxTemperatureToday
                     existingWeatherData.minTemperatureToday = weatherData.minTemperatureToday

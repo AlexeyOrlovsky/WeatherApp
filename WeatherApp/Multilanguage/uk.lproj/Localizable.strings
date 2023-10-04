@@ -6,11 +6,32 @@
   
 */
 
-"Location permission required" = "Потрібний дозвіл на місцезнаходження";
+// text in case temperature data is not received
+"Location permission required" = "Потрібен доступ до геопозиції";
 
+// Maximum temperature value
 "Max" = "Максимум";
 
+// Height temperature value
 "H" = "Макс";
+
+// Low temperature value
 "L" = "Мін";
+
+// Tomorrow text
 "Tomorrow" = "Завтра";
+
+// Day After Tomorrow text
 "DayAfterTomorrow" = "Післязавтра";
+
+// Access
+"Access disabled" = "Вимкнено доступ до даних про місцезнаходження";
+
+// Provide
+"provide access to geodata" = "Для відображення погоди у вашому місті вам потрібно надати доступ до геоданих";
+
+// Allow
+"Allow" = "Дозволити";
+
+// Cancel
+"Cancel" = "Скасувати";

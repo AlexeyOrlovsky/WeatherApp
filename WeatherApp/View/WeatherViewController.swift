@@ -18,13 +18,13 @@ class WeatherViewController: UIViewController {
     private var reachabilityManager: NetworkReachabilityManager?
     
     /// UI Elements
-    let countryWeatherLabel: UILabel = {
+    let currentCityNamelabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 24, weight: .bold)
         return label
     }()
     
-    let weatherView: UIView = {
+    let temperatureView: UIView = {
         let view = UIView()
         view.backgroundColor = .secondarySystemBackground
         view.layer.cornerRadius = 20
@@ -40,33 +40,33 @@ class WeatherViewController: UIViewController {
         return label
     }()
     
-    let maxTemperatureView: UIView = {
+    let maxTemperatureTodayView: UIView = {
         let view = UIView()
         view.backgroundColor = .secondarySystemBackground
         view.layer.cornerRadius = 10
         return view
     }()
     
-    let maxTemperatureLabel: UILabel = {
+    let maxTemperatureTodayLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .bold)
         return label
     }()
     
-    let minTemperatureView: UIView = {
+    let minTemperatureTodayView: UIView = {
         let view = UIView()
         view.backgroundColor = .secondarySystemBackground
         view.layer.cornerRadius = 10
         return view
     }()
     
-    let minTemperatureLabel: UILabel = {
+    let minTemperatureTodayLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .bold)
         return label
     }()
     
-    let tomorrowMaxTemperatureLabel: UILabel = {
+    let maxTemperatureTomorrowLabel: UILabel = {
         let label = UILabel()
         label.text = "Max".localized()
         label.textColor = .systemGray2
@@ -74,13 +74,13 @@ class WeatherViewController: UIViewController {
         return label
     }()
     
-    let tomorrowLabel: UILabel = {
+    let tomorrowTemperatureLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .bold)
         return label
     }()
     
-    let dayAfterTMaxTemperatureLabel: UILabel = {
+    let maxTemperatureDayAfterTomLabel: UILabel = {
         let label = UILabel()
         label.text = "Max".localized()
         label.textColor = .systemGray2
@@ -88,7 +88,7 @@ class WeatherViewController: UIViewController {
         return label
     }()
     
-    let dayAfterTomorrowLabel: UILabel = {
+    let dayAfterTomorrowTemperatureLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .bold)
         return label
@@ -109,22 +109,22 @@ class WeatherViewController: UIViewController {
     }
     
     func setupAddSubviews() {
-        view.addSubview(countryWeatherLabel)
+        view.addSubview(currentCityNamelabel)
         
-        view.addSubview(weatherView)
-        weatherView.addSubview(currentTemperatureLabel)
+        view.addSubview(temperatureView)
+        temperatureView.addSubview(currentTemperatureLabel)
         
-        view.addSubview(maxTemperatureView)
-        maxTemperatureView.addSubview(maxTemperatureLabel)
+        view.addSubview(maxTemperatureTodayView)
+        maxTemperatureTodayView.addSubview(maxTemperatureTodayLabel)
         
-        view.addSubview(minTemperatureView)
-        minTemperatureView.addSubview(minTemperatureLabel)
+        view.addSubview(minTemperatureTodayView)
+        minTemperatureTodayView.addSubview(minTemperatureTodayLabel)
         
-        view.addSubview(tomorrowMaxTemperatureLabel)
-        view.addSubview(tomorrowLabel)
+        view.addSubview(maxTemperatureTomorrowLabel)
+        view.addSubview(tomorrowTemperatureLabel)
         
-        view.addSubview(dayAfterTMaxTemperatureLabel)
-        view.addSubview(dayAfterTomorrowLabel)
+        view.addSubview(maxTemperatureDayAfterTomLabel)
+        view.addSubview(dayAfterTomorrowTemperatureLabel)
     }
     
     func setupLocationManager() {
@@ -138,7 +138,7 @@ class WeatherViewController: UIViewController {
         requestLocationUpdate()
         
         if !Reachability.isConnectedToNetwork() {
-            // Если нет интернета, загрузить данные из Realm
+            /// If not data from network, upload data from Realm
             if let loadedWeatherData = WeatherDataManager.shared.loadWeatherData() {
                 updateUI(with: loadedWeatherData)
             }
@@ -155,15 +155,15 @@ class WeatherViewController: UIViewController {
     
     func updateUI(with weatherData: WeatherDataRealm) {
         self.currentTemperatureLabel.text = "\(weatherData.currentTemperature)°C"
-        self.countryWeatherLabel.text = weatherData.cityName
+        self.currentCityNamelabel.text = weatherData.cityName
         let maxTemperatureLabelText = "H".localized() + ": \(weatherData.maxTemperatureToday)°C"
-        self.maxTemperatureLabel.text = maxTemperatureLabelText
+        self.maxTemperatureTodayLabel.text = maxTemperatureLabelText
         let minTemperatureLabelText = "L".localized() + ": \(weatherData.minTemperatureToday)°C"
-        self.minTemperatureLabel.text = minTemperatureLabelText
+        self.minTemperatureTodayLabel.text = minTemperatureLabelText
         let tomorrowLabelText = "Tomorrow".localized() + ": \(weatherData.tomorrowTemperature)°C"
-        self.tomorrowLabel.text = tomorrowLabelText
+        self.tomorrowTemperatureLabel.text = tomorrowLabelText
         let dayAfterTomorrowLabelText = "DayAfterTomorrow".localized() + ": \(weatherData.dayAfterTomorrowTemperature)°C"
-        self.dayAfterTomorrowLabel.text = dayAfterTomorrowLabelText
+        self.dayAfterTomorrowTemperatureLabel.text = dayAfterTomorrowLabelText
     }
     
     private func setupReachability() {
@@ -171,16 +171,16 @@ class WeatherViewController: UIViewController {
             reachabilityManager?.startListening { [weak self] status in
                 switch status {
                 case .reachable(_), .unknown:
-                    print("Сеть доступна или неизвестное состояние.")
+                    print("Network available")
                     self?.handleNetworkStatusChange()
                 case .notReachable:
-                    print("Сеть недоступна.")
+                    print("Network unavailable")
                 }
             }
         }
 
     private func handleNetworkStatusChange() {
-        // В этой функции вы можете добавить код для обновления данных и интерфейса,
+        /// Update data and interface
         if Reachability.isConnectedToNetwork() {
             locationManager?.startUpdatingLocation()
         }
@@ -190,13 +190,13 @@ class WeatherViewController: UIViewController {
     override func viewWillLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        countryWeatherLabel.snp.makeConstraints { make in
+        currentCityNamelabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalToSuperview().inset(120)
         }
         
-        weatherView.snp.makeConstraints { make in
-            make.top.equalTo(countryWeatherLabel.snp.bottom).offset(20)
+        temperatureView.snp.makeConstraints { make in
+            make.top.equalTo(currentCityNamelabel.snp.bottom).offset(20)
             make.centerX.equalToSuperview()
             make.width.equalTo(200)
             make.height.equalTo(200)
@@ -207,46 +207,46 @@ class WeatherViewController: UIViewController {
             make.width.equalTo(180)
         }
         
-        maxTemperatureView.snp.makeConstraints { make in
-            make.top.equalTo(weatherView.snp.bottom).offset(10)
-            make.left.equalTo(weatherView.snp.left)
+        maxTemperatureTodayView.snp.makeConstraints { make in
+            make.top.equalTo(temperatureView.snp.bottom).offset(10)
+            make.left.equalTo(temperatureView.snp.left)
             make.width.equalTo(95)
             make.height.equalTo(40)
         }
         
-        maxTemperatureLabel.snp.makeConstraints { make in
+        maxTemperatureTodayLabel.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
         
-        minTemperatureView.snp.makeConstraints { make in
-            make.top.equalTo(weatherView.snp.bottom).offset(10)
-            make.right.equalTo(weatherView.snp.right)
+        minTemperatureTodayView.snp.makeConstraints { make in
+            make.top.equalTo(temperatureView.snp.bottom).offset(10)
+            make.right.equalTo(temperatureView.snp.right)
             make.width.equalTo(95)
             make.height.equalTo(40)
         }
         
-        minTemperatureLabel.snp.makeConstraints { make in
+        minTemperatureTodayLabel.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
         
-        tomorrowLabel.snp.makeConstraints { make in
+        tomorrowTemperatureLabel.snp.makeConstraints { make in
             make.bottom.equalToSuperview().inset(50)
             make.left.equalToSuperview().inset(20)
         }
         
-        tomorrowMaxTemperatureLabel.snp.makeConstraints { make in
+        maxTemperatureTomorrowLabel.snp.makeConstraints { make in
             make.left.equalToSuperview().inset(20)
-            make.bottom.equalTo(tomorrowLabel.snp.top)
+            make.bottom.equalTo(tomorrowTemperatureLabel.snp.top)
         }
         
-        dayAfterTomorrowLabel.snp.makeConstraints { make in
+        dayAfterTomorrowTemperatureLabel.snp.makeConstraints { make in
             make.bottom.equalToSuperview().inset(50)
             make.right.equalToSuperview().inset(20)
         }
         
-        dayAfterTMaxTemperatureLabel.snp.makeConstraints { make in
-            make.left.equalTo(dayAfterTomorrowLabel.snp.left)
-            make.bottom.equalTo(dayAfterTomorrowLabel.snp.top)
+        maxTemperatureDayAfterTomLabel.snp.makeConstraints { make in
+            make.left.equalTo(dayAfterTomorrowTemperatureLabel.snp.left)
+            make.bottom.equalTo(dayAfterTomorrowTemperatureLabel.snp.top)
         }
     }
 }
@@ -255,53 +255,22 @@ class WeatherViewController: UIViewController {
 extension WeatherViewController: CLLocationManagerDelegate {
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        // В этом методе необходимо только инициализировать locationManager и запросить разрешение
+        /// Init locationManager and request permission
         
         switch manager.authorizationStatus {
         case .notDetermined:
             print("When user did not yet determined")
-            // Если разрешение еще не определено, ничего не делаем
         case .restricted:
             print("Restricted by parental control")
-            // Если разрешение ограничено, ничего не делаем
         case .denied:
             print("When user select option Dont't Allow")
-            // Пользователь запретил разрешение, начнем показывать Alert
             showLocationPermissionDeniedAlert()
         case .authorizedAlways:
             print("When user select option Change to Always Allow")
-            // Если разрешено всегда, ничего не делаем
         case .authorizedWhenInUse:
             print("When user select option Allow While Using App or Allow Once")
-            // Если разрешено при использовании приложения, ничего не делаем
         default:
             print("default")
-        }
-    }
-
-    func showLocationPermissionDeniedAlert() {
-        let alert = UIAlertController(title: "Доступ к геоданным отключен", message: "Вам нужно дать доступ к геоданным, чтобы мы могли показать вам погоду в вашем городе.", preferredStyle: .alert)
-
-        let settingsAction = UIAlertAction(title: "Разрешить", style: .default) { (_) in
-            // Откройте настройки приложения для изменения разрешений
-            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(settingsURL)
-            }
-        }
-
-        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel) { (_) in
-            // Закройте приложение
-            exit(0)
-        }
-
-        alert.addAction(settingsAction)
-        alert.addAction(cancelAction)
-
-        present(alert, animated: true, completion: nil)
-
-        // Добавьте задержку и повторите проверку разрешения через некоторое время
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-            self.locationManager?.requestWhenInUseAuthorization()
         }
     }
     
@@ -325,14 +294,43 @@ extension WeatherViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         switch status {
         case .authorizedWhenInUse:
-            // Разрешено использование геопозиции, выполните действия, связанные с получением погоды
-            // и т.д.
-            break // Добавьте оператор break, чтобы избежать ошибки компиляции
+            /// Allowed to use geolocation, perform actions related to getting weather
+            break /// break statement to avoid compilation error
         case .denied:
-            // Геолокация запрещена, покажите Alert
+            /// Geolocation  prohibited, show Alert
             showLocationPermissionDeniedAlert()
         default:
             break
+        }
+    }
+}
+
+/// Alerts
+extension WeatherViewController {
+    
+    func showLocationPermissionDeniedAlert() {
+        let alert = UIAlertController(title: "Access disabled".localized(), message: "provide access to geodata".localized(), preferredStyle: .alert)
+
+        let settingsAction = UIAlertAction(title: "Allow".localized(), style: .default) { (_) in
+            /// Open settings to change permissions
+            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(settingsURL)
+            }
+        }
+
+        let cancelAction = UIAlertAction(title: "Cancel".localized(), style: .destructive) { (_) in
+            /// сlose app
+            exit(0)
+        }
+
+        alert.addAction(cancelAction)
+        alert.addAction(settingsAction)
+
+        present(alert, animated: true, completion: nil)
+
+        /// delay and check permission after some time
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+            self.locationManager?.requestWhenInUseAuthorization()
         }
     }
 }
