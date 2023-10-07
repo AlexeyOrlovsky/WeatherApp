@@ -14,8 +14,8 @@ import Reachability
 
 class WeatherViewController: UIViewController {
     
-    var locationManager: CLLocationManager?
-    private var reachabilityManager: NetworkReachabilityManager?
+    var locationManager: CLLocationManager? /// object class CLLocationManager
+    private var reachabilityManager: NetworkReachabilityManager? /// object class CLLocationManager
     
     /// UI Elements
     let currentCityNamelabel: UILabel = {
@@ -127,60 +127,76 @@ class WeatherViewController: UIViewController {
         view.addSubview(dayAfterTomorrowTemperatureLabel)
     }
     
+    /// device location management
     func setupLocationManager() {
-        locationManager = CLLocationManager()
-        locationManager?.delegate = self
-        locationManager?.allowsBackgroundLocationUpdates = true
-        locationManager?.showsBackgroundLocationIndicator = true
+        locationManager = CLLocationManager() /// object CLLocationManager
+        locationManager?.delegate = self /// controller delegate CLLocationManager, the controller will receive notifications about location events
+        locationManager?.allowsBackgroundLocationUpdates = true /// permission to perform location updates in the background
+        locationManager?.showsBackgroundLocationIndicator = true /// this option shows an indicator in the status bar
         
-        locationManager?.requestWhenInUseAuthorization()
+        locationManager?.requestWhenInUseAuthorization() /// request permission to use location
         
-        requestLocationUpdate()
+        requestLocationUpdate() /// This method causes the location update to begin
         
+        /// checking the network status from the class. If the device is not connected to the network, follow these steps
         if !Reachability.isConnectedToNetwork() {
             /// If not data from network, upload data from Realm
-            if let loadedWeatherData = WeatherDataManager.shared.loadWeatherData() {
-                updateUI(with: loadedWeatherData)
+            if let loadedWeatherData = WeatherDataManager.shared.loadWeatherData() { /// If your device isn't connected to a network
+                updateUI(with: loadedWeatherData) /// If data is available, the interface is updated
             }
         }
     }
     
+    /// Method starts updating location data
     private func requestLocationUpdate() {
         locationManager?.startUpdatingLocation()
     }
     
+    /// Method stops updating location data
     private func stopLocationUpdate() {
         locationManager?.stopUpdatingLocation()
     }
     
+    /// Used for interface updated
     func updateUI(with weatherData: WeatherDataRealm) {
+        
+        /// updating texts based on values, multilingual added
         self.currentTemperatureLabel.text = "\(weatherData.currentTemperature)°C"
         self.currentCityNamelabel.text = weatherData.cityName
+        
         let maxTemperatureLabelText = "H".localized() + ": \(weatherData.maxTemperatureToday)°C"
         self.maxTemperatureTodayLabel.text = maxTemperatureLabelText
+        
         let minTemperatureLabelText = "L".localized() + ": \(weatherData.minTemperatureToday)°C"
         self.minTemperatureTodayLabel.text = minTemperatureLabelText
+        
         let tomorrowLabelText = "Tomorrow".localized() + ": \(weatherData.tomorrowTemperature)°C"
         self.tomorrowTemperatureLabel.text = tomorrowLabelText
+        
         let dayAfterTomorrowLabelText = "DayAfterTomorrow".localized() + ": \(weatherData.dayAfterTomorrowTemperature)°C"
         self.dayAfterTomorrowTemperatureLabel.text = dayAfterTomorrowLabelText
     }
     
+    /// this function monitors the network status
     private func setupReachability() {
-            reachabilityManager = NetworkReachabilityManager()
-            reachabilityManager?.startListening { [weak self] status in
-                switch status {
-                case .reachable(_), .unknown:
-                    print("Network available")
-                    self?.handleNetworkStatusChange()
-                case .notReachable:
-                    print("Network unavailable")
-                }
+        
+        reachabilityManager = NetworkReachabilityManager() /// creating object for network availability monitoring
+        reachabilityManager?.startListening { [weak self] status in /// method starts monitoring state network
+            
+            /// Handling network state changes
+            switch status {
+            case .reachable(_), .unknown: /// If the network  available or its status is unknown called method
+                print("Network available")
+                self?.handleNetworkStatusChange() /// update weather information
+            case .notReachable: /// If the network  unavailable, print text
+                print("Network unavailable")
             }
         }
-
+    }
+    
+    /// function update weather information after network connection restored
     private func handleNetworkStatusChange() {
-        /// Update data and interface
+        /// locationManager updated locations for get new data
         if Reachability.isConnectedToNetwork() {
             locationManager?.startUpdatingLocation()
         }
@@ -254,8 +270,8 @@ class WeatherViewController: UIViewController {
 // MARK: CLLocationManagerDelegate
 extension WeatherViewController: CLLocationManagerDelegate {
     
+    /// changing permissions to use geolocation by the application is being processed
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        /// Init locationManager and request permission
         
         switch manager.authorizationStatus {
         case .notDetermined:
@@ -269,36 +285,52 @@ extension WeatherViewController: CLLocationManagerDelegate {
             print("When user select option Change to Always Allow")
         case .authorizedWhenInUse:
             print("When user select option Allow While Using App or Allow Once")
+            /// default - for all other cases
         default:
             print("default")
         }
     }
     
+    /// updating weather information on screen when the device location changes and saving this information in Realm
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+        /// getting last updated location from array (list of coordinates)
         guard let location = locations.last else { return }
+        
         print("Latitude: \(location.coordinate.latitude), Longitude: \(location.coordinate.longitude)")
         
+        /// Function responsible for updating weather information on the screen when the device’s location changes and saving this information in Realm
         WeatherDataManager.shared.fetchWeather(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { result in
+            
             switch result {
+                
+                /// if request on server is successful, get WeatherData object with weather information
             case .success(let weatherData):
-                WeatherDataManager.shared.saveWeatherData(weatherData: weatherData)
+                WeatherDataManager.shared.saveWeatherData(weatherData: weatherData) /// saving received data in realm
                 DispatchQueue.main.async {
-                    self.updateUI(with: weatherData)
+                    self.updateUI(with: weatherData) /// updating user interface
                 }
+                
+                /// if error, print description error in console
             case .failure(let error):
                 print("Error: \(error.localizedDescription)")
             }
         }
     }
     
+    /// function tracks changes in permission status
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        
+        /// checking current permit status
         switch status {
-        case .authorizedWhenInUse:
+        case .authorizedWhenInUse: /// user allowed use geolocation (Allow While Using App or  Allow Once)
             /// Allowed to use geolocation, perform actions related to getting weather
             break /// break statement to avoid compilation error
         case .denied:
             /// Geolocation  prohibited, show Alert
             showLocationPermissionDeniedAlert()
+            
+            /// for all other cases
         default:
             break
         }
@@ -308,27 +340,29 @@ extension WeatherViewController: CLLocationManagerDelegate {
 /// Alerts
 extension WeatherViewController {
     
+    /// user did't give permission
     func showLocationPermissionDeniedAlert() {
         let alert = UIAlertController(title: "Access disabled".localized(), message: "provide access to geodata".localized(), preferredStyle: .alert)
-
+        
         let settingsAction = UIAlertAction(title: "Allow".localized(), style: .default) { (_) in
+            
             /// Open settings to change permissions
             if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
                 UIApplication.shared.open(settingsURL)
             }
         }
-
+        
         let cancelAction = UIAlertAction(title: "Cancel".localized(), style: .destructive) { (_) in
             /// сlose app
             exit(0)
         }
-
+        
         alert.addAction(cancelAction)
         alert.addAction(settingsAction)
-
+        
         present(alert, animated: true, completion: nil)
-
-        /// delay and check permission after some time
+        
+        /// after 5 seconds there will be an attempt to request permission to use geolocation again
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
             self.locationManager?.requestWhenInUseAuthorization()
         }
