@@ -1,6 +1,6 @@
 # WeatherApp
 
-Weather app.
+Weather app. (Test project) "Drum'N'Code"
 
 In this application you can find out: Current temperature, maximum temperature, minimum temperature,
 forecast of maximum temperature for tomorrow and the day after tomorrow in accordance with your city.
