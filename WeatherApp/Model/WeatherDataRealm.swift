@@ -5,6 +5,7 @@
 //  Created by Алексей Орловский on 02.10.2023.
 //
 
+import Foundation
 import RealmSwift
 
 class WeatherDataRealm: Object {

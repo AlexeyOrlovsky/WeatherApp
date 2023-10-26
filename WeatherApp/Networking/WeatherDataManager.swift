@@ -8,6 +8,7 @@
 import RealmSwift
 import Alamofire
 import os
+import Foundation
 
 class WeatherDataManager {
     static let shared = WeatherDataManager()
